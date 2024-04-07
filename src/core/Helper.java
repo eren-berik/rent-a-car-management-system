@@ -30,6 +30,10 @@ public class Helper {
                 msg = "Successful !";
                 yield "Success";
             }
+            case "notFound" -> {
+                msg = "Record not found !";
+                yield "Not Found";
+            }
             default -> {
                 msg = str;
                 yield "Warning";

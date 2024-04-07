@@ -13,14 +13,10 @@ public class Db {
 
     private Db() {
         try {
-            Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-    }
-
-    public Connection getConnection() {
-        return connection;
     }
 
     public static Connection getInstance() {
@@ -33,5 +29,9 @@ public class Db {
         }
 
         return instance.getConnection();
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 }
