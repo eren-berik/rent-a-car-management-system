@@ -23,16 +23,20 @@ public class Helper {
 
         String title = switch (str) {
             case "fill" -> {
-                msg = "Please fill all the fields !";
+                msg = "Please fill all the fields!";
                 yield "Error";
             }
             case "done" -> {
-                msg = "Successful !";
+                msg = "Successful!";
                 yield "Success";
             }
             case "notFound" -> {
-                msg = "Record not found !";
+                msg = "Record not found!";
                 yield "Not Found";
+            }
+            case "error" -> {
+                msg = "Something went wrong!";
+                yield "Error";
             }
             default -> {
                 msg = str;
@@ -41,6 +45,17 @@ public class Helper {
         };
 
         JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static boolean confirm (String str) {
+        String msg;
+        if (str.equals("sure")) {
+            msg = "Are you sure?";
+        } else {
+            msg = str;
+        }
+
+        return JOptionPane.showConfirmDialog(null, msg, "Are you sure?", JOptionPane.YES_NO_OPTION) == 0;
     }
 
     public static boolean isFieldEmpty(JTextField field) {
