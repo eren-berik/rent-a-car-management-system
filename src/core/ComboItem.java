@@ -9,6 +9,10 @@ public class ComboItem {
         this.value = value;
     }
 
+    public ComboItem(String str) {
+        this.value = str;
+    }
+
     public int getKey() {
         return key;
     }

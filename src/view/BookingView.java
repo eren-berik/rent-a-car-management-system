@@ -75,6 +75,7 @@ public class BookingView extends Layout{
 
                 if (this.bookManager.save(book)) {
                     Helper.showMessage("done");
+                    dispose();
                 } else {
                     Helper.showMessage("error");
                 }

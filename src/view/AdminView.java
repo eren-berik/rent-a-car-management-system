@@ -1,20 +1,16 @@
 package view;
 
+import business.BookManager;
 import business.BrandManager;
 import business.CarManager;
 import business.ModelManager;
 import core.ComboItem;
 import core.Helper;
-import entity.Brand;
-import entity.Car;
-import entity.Model;
-import entity.User;
+import entity.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MaskFormatter;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.ParseException;
@@ -61,26 +57,38 @@ public class AdminView extends Layout{
     private JFormattedTextField fld_start_date;
     private JScrollPane scrl_booking;
     private JButton btn_clear_book_fltr;
+    private JPanel pnl_reservation;
+    private JScrollPane scrl_reservations;
+    private JTable tbl_reservations;
+    private JComboBox cmb_plate;
+    private JPanel pnl_plate_filter;
+    private JLabel fld_plate;
+    private JButton btn_plate_clear;
+    private JButton btn_plate_search;
     private User user;
     private DefaultTableModel tmdl_brand = new DefaultTableModel();
     private DefaultTableModel tmdl_model = new DefaultTableModel();
     private DefaultTableModel tmbdl_car = new DefaultTableModel();
     private DefaultTableModel tmdl_booking = new DefaultTableModel();
+    private DefaultTableModel tmdl_reservation = new DefaultTableModel();
     private BrandManager brandManager;
     private ModelManager modelManager;
     private JPopupMenu brand_menu;
     private JPopupMenu model_menu;
     private JPopupMenu car_menu;
     private JPopupMenu booking_menu;
+    private JPopupMenu reservation_menu;
     private Object[] col_model;
     private Object[] col_booking_list;
     private Object[] col_car;
     private CarManager carManager;
+    private BookManager bookManager;
 
     public AdminView(User user) {
         this.brandManager = new BrandManager();
         this.modelManager = new ModelManager();
         this.carManager = new CarManager();
+        this.bookManager = new BookManager();
         this.add(container);
         this.guiInitialize(1000, 500);
         this.user = user;
@@ -104,6 +112,10 @@ public class AdminView extends Layout{
         loadBookingTable(null);
         loadBookingComponent();
         loadBookingFilter();
+
+        loadReservationTable(null);
+        loadReservationComponent();
+        loadReservationFilter();
     }
 
     private void loadBookingComponent() {
@@ -122,6 +134,7 @@ public class AdminView extends Layout{
                     loadBookingTable(null);
                     loadBookingFilter();
                     loadBookingTable(null);
+                    loadReservationTable(null);
                 }
             });
         });
@@ -178,6 +191,7 @@ public class AdminView extends Layout{
                 @Override
                 public void windowClosed(WindowEvent e) {
                     loadCarTable();
+                    loadReservationTable(null);
                 }
             });
         });
@@ -221,6 +235,7 @@ public class AdminView extends Layout{
                 @Override
                 public void windowClosed(WindowEvent e) {
                     loadModelTable(null);
+                    loadReservationTable(null);
                 }
             });
         });
@@ -286,6 +301,7 @@ public class AdminView extends Layout{
                     loadBrandTable();
                     loadModelTable(null);
                     loadModalFilterBrand();
+                    loadReservationTable(null);
                 }
             });
         });
@@ -346,5 +362,55 @@ public class AdminView extends Layout{
         this.fld_start_date.setText("10/10/2023");
         this.fld_end_date = new JFormattedTextField(new MaskFormatter("##/##/####"));
         this.fld_end_date.setText("16/10/2023");
+    }
+
+    private void loadReservationTable(ArrayList<Object[]> carList) {
+        this.col_booking_list = new Object[]{"ID", "Car ID", "Brand", "Model", "Plate", "Name", "ID Number", "Phone Number", "E-Mail", "Start Date", "End Date", "Price", "Status", "Note"};
+        if (carList == null) {
+            carList = this.bookManager.getForTable(this.col_booking_list.length, this.bookManager.getAllBookings());
+        }
+        createTable(this.tmdl_reservation, this.tbl_reservations, col_booking_list, carList);
+    }
+
+    public void loadReservationComponent() {
+        tableRowSelect(this.tbl_reservations);
+        this.reservation_menu = new JPopupMenu();
+        this.reservation_menu.add("Delete").addActionListener(e -> {
+            if (Helper.confirm("sure")) {
+                int selectId = this.getTableSelectedRow(tbl_reservations, 0);
+                if (this.bookManager.delete(selectId)) {
+                    Helper.showMessage("done");
+                    loadReservationTable(null);
+                    loadModelTable(null);
+                    loadModalFilterBrand();
+                    loadBookingTable(null);
+                } else {
+                    Helper.showMessage("error");
+                }
+            }
+        });
+
+        this.tbl_reservations.setComponentPopupMenu(this.reservation_menu);
+    }
+
+    public void loadReservationFilter() {
+        this.cmb_plate.removeAllItems();
+        for (Car obj : carManager.getAllCars()) {
+            this.cmb_plate.addItem(new ComboItem(obj.getPlate()));
+        }
+        this.cmb_plate.setSelectedItem(null);
+
+        btn_plate_search.addActionListener(e -> {
+            ArrayList<Book> carPlateList;
+            if (cmb_plate.getSelectedItem() == null) {  carPlateList = this.bookManager.getByPlate(null);
+            } else {carPlateList = this.bookManager.getByPlate(cmb_plate.getSelectedItem().toString());}
+
+            ArrayList<Object[]> carBookingRow = this.bookManager.getForTable(this.col_booking_list.length, carPlateList);
+            loadReservationTable(carBookingRow);
+        });
+
+        btn_plate_clear.addActionListener(e -> {
+            loadReservationFilter();
+        });
     }
 }

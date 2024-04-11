@@ -2,6 +2,7 @@ package dao;
 
 import core.Db;
 import entity.Book;
+import entity.Brand;
 import entity.Car;
 
 import java.sql.*;
@@ -19,6 +20,37 @@ public class BookDao {
 
     public ArrayList<Book> getAllBooks() {
         return this.selectByQuery("SELECT * FROM public.book ORDER BY book_id ASC");
+    }
+
+    public Book getById(int id) {
+        Book obj = null;
+        String query = "SELECT * FROM public.book WHERE book_id = ? ";
+        try {
+            PreparedStatement pr = this.con.prepareStatement(query);
+            pr.setInt(1, id);
+            ResultSet rs = pr.executeQuery();
+            if (rs.next()) {
+                obj = this.match(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return obj;
+    }
+
+    public boolean delete(int id) {
+        String query = "DELETE FROM public.book WHERE book_id = ? ";
+        try {
+            PreparedStatement pr = this.con.prepareStatement(query);
+            pr.setInt(1, id);
+
+            return pr.executeUpdate() != -1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return true;
     }
 
     public ArrayList<Book> selectByQuery(String query) {
