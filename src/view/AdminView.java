@@ -11,6 +11,8 @@ import entity.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MaskFormatter;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.ParseException;
@@ -99,6 +101,8 @@ public class AdminView extends Layout{
 
         this.lbl_welcome.setText("Welcome " + this.user.getUsername() + " !");
 
+        loadComponent();
+
         loadBrandTable();
         loadBrandComponent();
 
@@ -116,6 +120,17 @@ public class AdminView extends Layout{
         loadReservationTable(null);
         loadReservationComponent();
         loadReservationFilter();
+
+    }
+
+    private void loadComponent() {
+        this.btn_logout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                LoginView loginView = new LoginView();
+            }
+        });
     }
 
     private void loadBookingComponent() {
@@ -192,6 +207,7 @@ public class AdminView extends Layout{
                 public void windowClosed(WindowEvent e) {
                     loadCarTable();
                     loadReservationTable(null);
+                    loadBookingTable(null);
                 }
             });
         });
@@ -201,6 +217,8 @@ public class AdminView extends Layout{
                 if (this.carManager.delete(selectCarId)) {
                     Helper.showMessage("done");
                     loadCarTable();
+                    loadReservationComponent();
+                    loadBookingTable(null);
                 } else {
                     Helper.showMessage("error");
                 }
@@ -236,6 +254,7 @@ public class AdminView extends Layout{
                 public void windowClosed(WindowEvent e) {
                     loadModelTable(null);
                     loadReservationTable(null);
+                    loadBookingTable(null);
                 }
             });
         });
@@ -245,6 +264,8 @@ public class AdminView extends Layout{
                 if (this.modelManager.delete(selectModelId)) {
                     Helper.showMessage("done");
                     loadModelTable(null);
+                    loadBookingTable(null);
+                    loadReservationTable(null);
                 } else {
                     Helper.showMessage("error");
                 }
@@ -302,6 +323,7 @@ public class AdminView extends Layout{
                     loadModelTable(null);
                     loadModalFilterBrand();
                     loadReservationTable(null);
+                    loadBookingTable(null);
                 }
             });
         });
@@ -313,6 +335,7 @@ public class AdminView extends Layout{
                     loadBrandTable();
                     loadModelTable(null);
                     loadModalFilterBrand();
+                    loadBookingTable(null);
                 } else {
                     Helper.showMessage("error");
                 }
